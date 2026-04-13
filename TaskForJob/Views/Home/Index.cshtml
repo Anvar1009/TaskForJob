@@ -1,0 +1,76 @@
+﻿@using Entity.Models
+@model List<Employees>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<div class="text-center">
+    <h1 class="display-4">Employees Table</h1>
+
+    <form asp-action="Import" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" class="form-control" />
+        <br />
+        <button type="submit" class="btn btn-primary">Import</button>
+    </form>
+
+    @if (ViewBag.Count != null)
+    {
+        <div class="alert alert-success">
+            @ViewBag.Count added rows
+        </div>
+    }
+
+    <table id="employeesTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>DataOfBirth</th>
+                <th>Telephone</th>
+                <th>Mobile phone</th>
+                <th>Address</th>
+                <th>Address-2</th>
+                <th>Post Code</th>
+                <th>Email Home</th>
+                <th>Start Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Fore_Names</td>
+                    <td>@item.Sur_Names</td>
+                    <td>@item.DataOfBirth</td>
+                    <td>@item.Telephone</td>
+                    <td>@item.Mobile_phone</td>
+                    <td>@item.Address</td>
+                    <td>@item.Address_2</td>
+                    <td>@item.Post_Code</td>
+                    <td>@item.Email_Home</td>
+                    <td>@item.StartDate</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary" href="/Home/Edit/@item.Id">Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+        $('#employeesTable').DataTable({
+        "order": [[1, "asc"]],
+        "pageLength": 5
+        });
+        });
+    </script>
+}

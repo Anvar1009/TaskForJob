@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Entity/Entity.csproj" />
+  <Project Path="TaskForJob/TaskForJob.csproj" />
+</Solution>
