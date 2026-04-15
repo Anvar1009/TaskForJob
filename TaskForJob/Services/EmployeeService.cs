@@ -21,6 +21,8 @@ namespace TaskForJob.Services
             {
                 return false;
             }
+
+            // Convert DateTime to UTC 
             model.DataOfBirth = DateTime.SpecifyKind(model.DataOfBirth, DateTimeKind.Utc);
             model.StartDate = DateTime.SpecifyKind(model.StartDate, DateTimeKind.Utc);
 
@@ -50,22 +52,29 @@ namespace TaskForJob.Services
                                 continue;
                             if (string.IsNullOrWhiteSpace(value_part[0]) && string.IsNullOrWhiteSpace(value_part[1]))
                                 continue; // If for first and second values null or space
-                            DateTime.TryParseExact(
+
+                        // data time version exact
+                        DateTime.TryParseExact(
                                 value_part[3],
                                 "dd/MM/yyyy",
                                 null,
                                 System.Globalization.DateTimeStyles.None,
                                 out DateTime dob
-                            ); // data time version exact
+                            );
+                        // Convert DateTime to UTC 
+                        dob = DateTime.SpecifyKind(dob, DateTimeKind.Utc);
 
-                            DateTime.TryParseExact(
+                        DateTime.TryParseExact(
                                 value_part[10],
                                 "dd/MM/yyyy",
                                 null,
                                 System.Globalization.DateTimeStyles.None,
                                 out DateTime startDate
                             );
-                            employ = new Employees
+                        // Convert DateTime to UTC 
+                        startDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc);
+
+                        employ = new Employees
                             {
                                 Payroll_Number = value_part[0],
                                 Fore_Names = value_part[1],
@@ -89,7 +98,18 @@ namespace TaskForJob.Services
             if (!_entityContext.employees.Any(a => a.Payroll_Number == employ.Payroll_Number))
             {
                 _entityContext.employees.AddRange(employees);
-                _entityContext.SaveChanges();
+                try
+                {
+                    _entityContext.SaveChanges();
+
+                }
+                catch (Exception ex)
+                {
+                    {
+                        var error = ex.InnerException?.Message;
+                        throw;
+                    }
+                }
             }
             
 

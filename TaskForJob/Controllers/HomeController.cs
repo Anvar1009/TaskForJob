@@ -13,7 +13,7 @@ namespace TaskForJob.Controllers
     {
         private readonly IEmployeeService _employeeService;
         private readonly EntityContext _entityContext;
-        public HomeController(EntityContext entityContext, EmployeeService employeeService)
+        public HomeController(EntityContext entityContext, IEmployeeService employeeService)
         {
             _entityContext = entityContext;
             _employeeService = employeeService;

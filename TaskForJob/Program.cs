@@ -1,5 +1,7 @@
 using Entity;
 using Microsoft.EntityFrameworkCore;
+using TaskForJob.Services;
+using TaskForJob.Services.Interfaces;
 
 namespace TaskForJob
 {
@@ -13,6 +15,10 @@ namespace TaskForJob
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<EntityContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

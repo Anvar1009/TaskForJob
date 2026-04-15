@@ -40,13 +40,14 @@ namespace TaskForJob.Tests
         [Fact]
         public void Import_Return_Zero_When_File_Empty()
         {
+            // created DB in memory
             var options = new DbContextOptionsBuilder<EntityContext>()
                 .UseInMemoryDatabase(databaseName: "TestDb2")
                 .Options;
 
             using var context = new EntityContext(options);
             var service = new EmployeeService(context);
-
+            // this empty file
             var file = CreateFile("Header1,Header2");
 
             var result = service.Import(file);
