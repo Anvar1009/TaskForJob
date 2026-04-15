@@ -18,7 +18,7 @@ namespace Entity
         {
             var optionsBuilder = new DbContextOptionsBuilder<EntityContext>();
 
-            optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=TaskForJob;Username=postgres;Password=anvar1009");
+            optionsBuilder.UseNpgsql("your_connection_string_here");
 
             return new EntityContext(optionsBuilder.Options);
         }
