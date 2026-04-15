@@ -4,15 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using TaskForJob.Models;
+using TaskForJob.Services;
+using TaskForJob.Services.Interfaces;
 
 namespace TaskForJob.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IEmployeeService _employeeService;
         private readonly EntityContext _entityContext;
-        public HomeController(EntityContext entityContext)
+        public HomeController(EntityContext entityContext, EmployeeService employeeService)
         {
             _entityContext = entityContext;
+            _employeeService = employeeService;
         }
 
         public  IActionResult Index()
@@ -28,61 +32,15 @@ namespace TaskForJob.Controllers
         [HttpPost]
         public IActionResult Import(IFormFile file)
         {
-
-            var employees = new List<Employees>();
-            if (file != null && file.Length > 0)
+            if (file == null || file.Length == 0)
             {
-                using (var reader = new StreamReader(file.OpenReadStream()))
-                {
-                    reader.ReadLine();  // skip header
-                    while (!reader.EndOfStream)
-                    {
-                        var line = reader.ReadLine();// read one row
-                        if (string.IsNullOrWhiteSpace(line)) // If for line null or space
-                            continue;
-                        var value_part = line.Split(','); // row to parts by ','
-                        if (value_part.Length < 11 ) // If for length
-                            continue;
-                        if (string.IsNullOrWhiteSpace(value_part[0]) && string.IsNullOrWhiteSpace(value_part[1]))
-                            continue; // If for first and second values null or space
-                        DateTime.TryParseExact(
-                            value_part[2],
-                            "dd/MM/yyyy",
-                            null,
-                            System.Globalization.DateTimeStyles.None,
-                            out DateTime dob
-                        ); // data time version exact
-
-                        DateTime.TryParseExact(
-                            value_part[9],
-                            "dd/MM/yyyy",
-                            null,
-                            System.Globalization.DateTimeStyles.None,
-                            out DateTime startDate
-                        );
-                        var employ = new Employees
-                        {
-                            Fore_Names = value_part[1],
-                            Sur_Names = value_part[2],
-                            DataOfBirth =dob,
-                            Telephone = value_part[4],
-                            Mobile_phone = value_part[5],
-                            Address = value_part[6],
-                            Address_2 = value_part[7],
-                            Post_Code = value_part[8],
-                            Email_Home = value_part[9],
-                            StartDate =startDate,
-                        }; // mapping
-                       
-                        employees.Add( employ );    // list add
-                    }
-                }
+                TempData["Message"] = "Please select a valid file";
+                return RedirectToAction("Index");
             }
-            // DB add
-            _entityContext.employees.AddRange(employees);
-            _entityContext.SaveChanges();
-            ViewBag.Count = employees.Count; // send to count in view
-            return View("Index", _entityContext.employees.ToList());
+            var emp = _employeeService.Import(file);
+            TempData["Message"] = $"{emp.Count} rows successfully imported";
+
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -100,20 +58,15 @@ namespace TaskForJob.Controllers
         {
             if (ModelState.IsValid)
             {
-                try
-                {
+                if (!ModelState.IsValid)
+                    return View(model);
 
-                    model.DataOfBirth = DateTime.SpecifyKind(model.DataOfBirth, DateTimeKind.Utc);
-                    model.StartDate = DateTime.SpecifyKind(model.StartDate, DateTimeKind.Utc);
+                var result = _employeeService.Editer(model);
 
-                    _entityContext.employees.Update(model);
-                    _entityContext.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    var error = ex.InnerException?.Message;
-                    throw;
-                }
+                if (!result)
+                    return NotFound();
+
+                TempData["Message"] = "Employee updated successfully";
 
                 return RedirectToAction("Index");
             }

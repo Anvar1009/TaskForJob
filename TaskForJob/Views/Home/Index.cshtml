@@ -26,6 +26,7 @@
     <table id="employeesTable">
         <thead>
             <tr>
+                <th>Payroll Number</th>
                 <th>Name</th>
                 <th>Surname</th>
                 <th>DataOfBirth</th>
@@ -43,6 +44,7 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>@item.Payroll_Number</td>
                     <td>@item.Fore_Names</td>
                     <td>@item.Sur_Names</td>
                     <td>@item.DataOfBirth</td>

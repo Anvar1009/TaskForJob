@@ -7,6 +7,7 @@ namespace Entity.Models
     public class Employees
     {
         public int Id { get; set; }
+        public string Payroll_Number { get; set; }
         public string Fore_Names { get; set; }
         public string Sur_Names { get; set; }
         public DateTime DataOfBirth  { get; set; }
